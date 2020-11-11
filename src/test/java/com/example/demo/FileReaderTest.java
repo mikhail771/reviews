@@ -26,13 +26,12 @@ public class FileReaderTest {
     @BeforeClass
     public static void createTestResources() {
         File validFile = new File(PATH_TO_VALID_TEST_FILE);
-        File emptyFile = new File(PATH_TO_EMPTY_TEST_FILE);
         try {
             FileWriter writer = new FileWriter(validFile, false);
             writer.write(CONTENT);
             writer.flush();
         } catch(IOException ex){
-            throw new RuntimeException(ex.getMessage());
+            throw new RuntimeException(ex.getMessage(), ex);
         }
     }
 
@@ -42,8 +41,8 @@ public class FileReaderTest {
         Assert.assertEquals(CONTENT_LIST, actual);
     }
 
-    @Test(expected = ReadFileException.class)
-    public void exceptionWithEmptyFile() {
+    @Test
+    public void readWithEmptyFile() {
         List<String> list = service.read(PATH_TO_EMPTY_TEST_FILE);
         Assert.assertTrue(list.isEmpty());
     }
