@@ -13,33 +13,43 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class FileReaderTest {
-    private static final String PATH_TO_VALID_TEST_FILE = "src/main/resources/test_file.csv";
-    private static final String WRONG_PATH = "src/main/resources/file.csv";
-    private static final String CONTENT = "I, wont, to, find, job!";
+    private static final String PATH_TO_VALID_TEST_FILE = "src/test/resources/test_file.csv";
+    private static final String PATH_TO_EMPTY_TEST_FILE = "src/test/resources/empty_test_file.csv";
+    private static final String WRONG_PATH = "src/test/resources/file.csv";
+    private static final String CONTENT = "I, want, to, find, job!\n"
+            +"I will, find, job, of my dream!\nSoon!";
+    private static final List<String> CONTENT_LIST = List.of("I, want, to, find, job!",
+            "I will, find, job, of my dream!", "Soon!");
 
     private FileReaderService service = new FileReaderServiceImpl();
+
     @BeforeClass
     public static void createTestResources() {
         File validFile = new File(PATH_TO_VALID_TEST_FILE);
-        try(FileWriter writer = new FileWriter(validFile, false))
-        {
+        File emptyFile = new File(PATH_TO_EMPTY_TEST_FILE);
+        try {
+            FileWriter writer = new FileWriter(validFile, false);
             writer.write(CONTENT);
             writer.flush();
-        }
-        catch(IOException ex){
-            System.out.println(ex.getMessage());
+        } catch(IOException ex){
+            throw new RuntimeException(ex.getMessage());
         }
     }
 
     @Test
     public void readingValidFile_Ok() {
-        List<String> expected = List.of(CONTENT);
         List<String> actual = service.read(PATH_TO_VALID_TEST_FILE);
-        Assert.assertEquals(expected, actual);
+        Assert.assertEquals(CONTENT_LIST, actual);
     }
 
     @Test(expected = ReadFileException.class)
-    public void exceptionWithWrongPath () {
+    public void exceptionWithEmptyFile() {
+        List<String> list = service.read(PATH_TO_EMPTY_TEST_FILE);
+        Assert.assertTrue(list.isEmpty());
+    }
+
+    @Test(expected = ReadFileException.class)
+    public void exceptionWithWrongPath() {
         service.read(WRONG_PATH);
     }
 

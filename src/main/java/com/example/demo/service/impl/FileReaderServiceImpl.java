@@ -14,8 +14,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class FileReaderServiceImpl implements FileReaderService {
     @Override
-    public List<String> read(String path) throws ReadFileException {
-        try (Stream<String> stream = Files.lines(Paths.get(path))) {
+    public List<String> read(String path) {
+        try {
+            Stream<String> stream = Files.lines(Paths.get(path));
             return stream.collect(Collectors.toList());
         } catch (FileNotFoundException e) {
             throw new ReadFileException("File at the path " + path + " not found.", e);
